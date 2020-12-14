@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyController : Shape
+public class EnemyController : Shape, IKillable
 {
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        
+        base.Start();
+        Name = "enemy";
+        Debug.Log("Enemy spawned");
     }
 
     // Update is called once per frame
@@ -24,7 +26,16 @@ public class EnemyController : Shape
 
         if(bottom <= -gameSceneController.screenBounds.y)
         {
-            Destroy(gameObject);
+            gameSceneController.KillObject(this);
         }
+    }
+
+    public void Kill(){
+        Destroy(gameObject);
+    }
+
+    public string GetName()
+    {
+        return Name; 
     }
 }

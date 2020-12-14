@@ -10,7 +10,7 @@ public class Shape : MonoBehaviour
     private SpriteRenderer SpriteRenderer;
     public string Name;
 
-    void Start()
+    protected virtual void Start()
     {
         gameSceneController = FindObjectOfType<GameSceneController>(); 
         SpriteRenderer = GetComponent<SpriteRenderer>();
@@ -23,5 +23,11 @@ public class Shape : MonoBehaviour
     {
         SpriteRenderer spriteRenderer =  GetComponent<SpriteRenderer>();
         spriteRenderer.color = newColor;
+    }
+
+    public void SetColor(float red, float green, float blue)
+    {
+        Color newColor = new Color(red, green, blue);
+        SpriteRenderer.color = newColor; 
     }
 }

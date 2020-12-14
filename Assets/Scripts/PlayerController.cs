@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class PlayerController : Shape
 {
- public ProjectileController projectileController; 
+ public ProjectileController projectileController;
     // Update is called once per frame
+
+    protected override void Start()
+    {
+        base.Start();
+    }
+    
     void Update()
     {
         MovePlayer();

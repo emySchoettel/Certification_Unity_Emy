@@ -42,4 +42,10 @@ public class GameSceneController : MonoBehaviour
 
         return mainCamera.ScreenToWorldPoint(screenVector);
     }
+
+    public void KillObject(IKillable killable)
+    {
+        Debug.LogWarningFormat("{0} killed by GM", killable.GetName());
+        killable.Kill();
+    }
 }

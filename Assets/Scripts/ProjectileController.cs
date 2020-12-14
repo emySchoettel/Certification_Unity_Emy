@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileController : Shape
+public class ProjectileController : Shape, IKillable
 {
     public Vector2 projectileDirection;
     public float projectileSpeed; 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        
+        base.Start();
+    Name ="projectile";
+        SetColor(0,255,0);
     }
 
     // Update is called once per frame
@@ -29,7 +31,16 @@ public class ProjectileController : Shape
         float top = transform.position.y + haldHeight;
         if(top >= gameSceneController.screenBounds.y)
         {
-            Destroy(gameObject);
+           gameSceneController.KillObject(this);
         }
+    }
+
+    public void Kill(){
+        Destroy(gameObject);
+    }
+
+    public string GetName()
+    {
+        return Name; 
     }
 }
