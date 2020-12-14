@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate void TextOutputHandler(string text); 
 public class GameSceneController : MonoBehaviour
 {
     public float playerSpeed; 
     public Vector3 screenBounds; 
     public EnemyController enemy; 
+
+    private HubControl hud;
+    private int totalPoints; 
     // Start is called before the first frame update
     void Start()
     {
+        hud = FindObjectOfType<HubControl>();
         playerSpeed = 10; 
         screenBounds = GetScreenBounds(); 
         StartCoroutine(SpawnEnemies());
@@ -29,10 +34,18 @@ public class GameSceneController : MonoBehaviour
             float horizontalPosition = Random.Range(-screenBounds.x, screenBounds.x);
             Vector2 spawnPosition = new Vector2(horizontalPosition, screenBounds.y);
 
-            Instantiate(enemy, spawnPosition, Quaternion.identity);
+            EnemyController enemyC = Instantiate(enemy, spawnPosition, Quaternion.identity);
 
+            enemyC.EnemyEscaped += EnemyAtBottom;
+            enemyC.EnnemyKilled += EnemyKilled; 
             yield return wait; 
         }
+    }
+
+    void EnemyKilled(int pointValue)
+    {
+        totalPoints += pointValue; 
+        hud.scoreText.text = totalPoints.ToString();
     }
 
     private Vector3 GetScreenBounds()
@@ -45,7 +58,17 @@ public class GameSceneController : MonoBehaviour
 
     public void KillObject(IKillable killable)
     {
-        Debug.LogWarningFormat("{0} killed by GM", killable.GetName());
         killable.Kill();
+    }
+
+    public void OutputText(string output)
+    {
+        Debug.LogFormat("{0} output by GM", output);
+    }
+
+    private void EnemyAtBottom(EnemyController enemy)
+    {
+        Destroy(enemy.gameObject);
+        Debug.Log("Enemy Escaped");
     }
 }

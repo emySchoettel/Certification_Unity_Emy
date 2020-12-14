@@ -10,7 +10,7 @@ public class ProjectileController : Shape, IKillable
     protected override void Start()
     {
         base.Start();
-    Name ="projectile";
+        Name ="projectile";
         SetColor(0,255,0);
     }
 
