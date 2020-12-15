@@ -5,19 +5,28 @@ using UnityEngine;
 public class PlayerController : Shape
 {
  public ProjectileController projectileController;
+ private PlayerController playerController; 
     // Update is called once per frame
 
     protected override void Start()
     {
         base.Start();
+        playerController = FindObjectOfType<PlayerController>();
     }
-    
+
+
     void Update()
     {
         MovePlayer();
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             FireProjectile(); 
+            playerController.SetColor(Color.red);
+        }
+        if(Input.GetKeyUp(KeyCode.Space))
+        {
+            playerController.SetColor(Color.yellow);
         }
     }
 
