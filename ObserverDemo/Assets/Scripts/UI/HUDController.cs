@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class HUDController : MonoBehaviour
+public class HUDController : MonoBehaviour, IEndGameObserver
 {
 
 	#region Field Declarations
@@ -35,6 +35,9 @@ public class HUDController : MonoBehaviour
     private void Start()
     {
         GameScene = FindObjectOfType<GameSceneController>(); 
+
+        GameScene.AddObserver(this);
+
         GameScene.EnemyHandler += GameScene_EnemyHandler;
         GameScene.LifeLost += HideShip;
     }
@@ -67,4 +70,9 @@ public class HUDController : MonoBehaviour
     }
 
     #endregion
+
+    public void Notify()
+    {
+        ShowStatus("Game Over");
+    }
 }

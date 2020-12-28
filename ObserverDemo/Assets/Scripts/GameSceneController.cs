@@ -41,6 +41,10 @@ public class GameSceneController : MonoBehaviour
     {
         StartLevel(currentLevelIndex);
     }
+    
+    private void Awake() {
+        endGameObservers = new List<IEndGameObserver>();
+    }
 
     #endregion
 
@@ -67,6 +71,31 @@ public class GameSceneController : MonoBehaviour
         {
             //TODO: Clean up
             StartLevel(currentLevelIndex);
+        }
+    }
+
+    #endregion
+
+    #region Subject Implementation
+
+    private List<IEndGameObserver> endGameObservers;
+
+    public void AddObserver(IEndGameObserver observer)
+    {
+        endGameObservers.Add(observer);
+    }
+
+    public void RemoveObserver(IEndGameObserver observer)
+    {
+        endGameObservers.Remove(observer);
+    }
+
+    private void NotifyObserver()
+    {
+        foreach(IEndGameObserver observer in endGameObservers)
+        {
+            observer.Notify();
+            //print(observer);
         }
     }
 
@@ -100,6 +129,11 @@ public class GameSceneController : MonoBehaviour
         {
             StartCoroutine(SpawnShip(true));
         }
+        else
+        {
+            StopAllCoroutines();
+            NotifyObserver();
+        }
          
     }
 
@@ -113,6 +147,8 @@ public class GameSceneController : MonoBehaviour
             Vector2 spawnPosition = ScreenBounds.RandomTopPosition();
 
             EnemyController enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+
+            AddObserver(enemy);
             enemy.gameObject.layer = LayerMask.NameToLayer("Enemy");
             enemy.shotSpeed = currentLevel.enemyShotSpeed;
             enemy.speed = currentLevel.enemySpeed;
@@ -140,7 +176,8 @@ public class GameSceneController : MonoBehaviour
         {
             int index = UnityEngine.Random.Range(0, powerUpPrefabs.Length);
             Vector2 spawnPosition = ScreenBounds.RandomTopPosition();
-            Instantiate(powerUpPrefabs[index], spawnPosition, Quaternion.identity);
+            PowerupController powerUp = Instantiate(powerUpPrefabs[index], spawnPosition, Quaternion.identity);
+            AddObserver(powerUp);
             yield return new WaitForSeconds(UnityEngine.Random.Range(currentLevel.powerUpMinimumWait,currentLevel.powerUpMaximumWait));
         }
     }

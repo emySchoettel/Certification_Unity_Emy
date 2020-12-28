@@ -30,7 +30,14 @@ public class PlayerController : MonoBehaviour
         shieldTimeOut = new WaitForSeconds(shieldDuration);
         gameScene = FindObjectOfType<GameSceneController>();
         gameScene.EnemyHandler +=  GameScene_EnemyHandler; 
+        EventBroker.ProjectileOutOfBounds += EnableProjectile;
+
         EnableShield();
+    }
+
+    private void OnDisable() 
+    {
+        EventBroker.ProjectileOutOfBounds -= EnableProjectile;
     }
 
     private void GameScene_EnemyHandler(int pointValue)
@@ -98,13 +105,11 @@ public class PlayerController : MonoBehaviour
         ProjectileController projectile =
             Instantiate(projectilePrefab, spawnPosition, Quaternion.AngleAxis(90, Vector3.forward));
 
-       projectile.gameObject.GetComponent<SpriteRenderer>().color = Color.green;
+        projectile.gameObject.GetComponent<SpriteRenderer>().color = Color.green;
         projectile.gameObject.layer = LayerMask.NameToLayer("PlayerProjectile");
         projectile.isPlayers = true;
         projectile.projectileSpeed = 4;
         projectile.projectileDirection = Vector2.up;
-
-        projectile.ProjectileOutOfBounds += EnableProjectile;
 
         DisableProjectile();
     }
@@ -123,7 +128,12 @@ public class PlayerController : MonoBehaviour
     {
         GameObject xp = Instantiate(expolsion, transform.position, Quaternion.identity);
         xp.transform.localScale = new Vector2(2, 2);
-        HitByEnemy.Invoke();
+        if(HitByEnemy != null)
+        {
+            HitByEnemy();
+        }
+
+        gameScene.EnemyHandler -= GameScene_EnemyHandler;
 
         Destroy(gameObject);
     }
