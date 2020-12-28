@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class GameSceneController : MonoBehaviour
 {
+
+    public event EnemyDestroyedHandler EnemyHandler; 
+    public event Action<int> LifeLost;
     #region Field Declarations
 
     [Header("Enemy & Power Prefabs")]
@@ -79,7 +83,24 @@ public class GameSceneController : MonoBehaviour
         ship.speed = playerSpeed;
         ship.shieldDuration = shieldDuration;
 
+        ship.HitByEnemy += Ship_HitByEnemy;
+
         yield return null;
+    }
+
+    private void Ship_HitByEnemy()
+    {
+        lives--;
+
+        if(LifeLost != null)
+        {
+            LifeLost(lives);
+        }
+        if (lives > 0)
+        {
+            StartCoroutine(SpawnShip(true));
+        }
+         
     }
 
     private IEnumerator SpawnEnemies()
@@ -97,10 +118,21 @@ public class GameSceneController : MonoBehaviour
             enemy.speed = currentLevel.enemySpeed;
             enemy.shotdelayTime = currentLevel.enemyShotDelay;
             enemy.angerdelayTime = currentLevel.enemyAngerDelay;
+
+            enemy.enemyHandler +=  Enemy_EnemyHandler;
  
             yield return wait;
         }
     }
+
+    private void Enemy_EnemyHandler(int pointvalue)
+    {
+        totalPoints += pointvalue;
+
+        if(EnemyHandler != null)
+            EnemyHandler(totalPoints);
+    }
+
     
     private IEnumerator SpawnPowerUp()
     {

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class HUDController : MonoBehaviour
 {
+
 	#region Field Declarations
 
 	[Header("UI Components")]
@@ -16,6 +17,8 @@ public class HUDController : MonoBehaviour
     [Space]
     private Image[] shipImages;
 
+    private GameSceneController GameScene; 
+
     #endregion
 
     #region Startup
@@ -28,6 +31,18 @@ public class HUDController : MonoBehaviour
     #endregion
 
     #region Public methods
+
+    private void Start()
+    {
+        GameScene = FindObjectOfType<GameSceneController>(); 
+        GameScene.EnemyHandler += GameScene_EnemyHandler;
+        GameScene.LifeLost += HideShip;
+    }
+
+    private void GameScene_EnemyHandler(int pointValue)
+    {
+        UpdateScore(pointValue);
+    }
 
     public void UpdateScore(int score)
     {

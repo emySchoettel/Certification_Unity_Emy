@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
-
+public delegate void EnemyDestroyedHandler(int pointValue); 
 public class EnemyController : MonoBehaviour
 {
+    public event EnemyDestroyedHandler enemyHandler;
+
     #region Field Declarations
 
     [Header("Prefabs")]
@@ -66,12 +68,15 @@ public class EnemyController : MonoBehaviour
     {
         Destroy(collision.gameObject);
 
-        FindObjectOfType<PlayerController>().EnableProjectile();
+        //FindObjectOfType<PlayerController>().EnableProjectile();
         FindObjectOfType<HUDController>().UpdateScore(pointValue);
         
         GameObject xPlosion = Instantiate(explosion, transform.position, Quaternion.identity);
         xPlosion.transform.localScale = new Vector2(2, 2);
-
+        if(enemyHandler != null)
+        {
+            enemyHandler(pointValue);
+        }
         Destroy(gameObject);
     }
 

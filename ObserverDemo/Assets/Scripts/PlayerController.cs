@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,8 +14,12 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float shieldDuration;
     [HideInInspector] public float speed;
 
+    public event Action HitByEnemy; 
+
     private bool projectileEnabled = true;
     private WaitForSeconds shieldTimeOut;
+
+    private GameSceneController gameScene; 
     
     #endregion
 
@@ -23,7 +28,14 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         shieldTimeOut = new WaitForSeconds(shieldDuration);
+        gameScene = FindObjectOfType<GameSceneController>();
+        gameScene.EnemyHandler +=  GameScene_EnemyHandler; 
         EnableShield();
+    }
+
+    private void GameScene_EnemyHandler(int pointValue)
+    {
+        EnableProjectile();
     }
 
     #endregion
@@ -64,10 +76,13 @@ public class PlayerController : MonoBehaviour
 
     #region Projectile Management
 
-    public void EnableProjectile()
+    private void EnableProjectile()
     {
-        projectileEnabled = true;
-        availableBullet.SetActive(projectileEnabled);
+        if(this!= null)
+        {
+            projectileEnabled = true;
+            availableBullet.SetActive(projectileEnabled);
+        }   
     }
 
     public void DisableProjectile()
@@ -88,6 +103,10 @@ public class PlayerController : MonoBehaviour
         projectile.isPlayers = true;
         projectile.projectileSpeed = 4;
         projectile.projectileDirection = Vector2.up;
+
+        projectile.ProjectileOutOfBounds += EnableProjectile;
+
+        DisableProjectile();
     }
 
     #endregion
@@ -104,6 +123,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject xp = Instantiate(expolsion, transform.position, Quaternion.identity);
         xp.transform.localScale = new Vector2(2, 2);
+        HitByEnemy.Invoke();
 
         Destroy(gameObject);
     }
